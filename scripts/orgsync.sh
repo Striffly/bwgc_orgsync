@@ -107,11 +107,16 @@ members_to_confirm() {
 # stdin and prints the collection with every confirmed member (status 2) added
 # to its users, keeping existing groups and users as they are. Prints nothing
 # when no member is missing, so the caller skips the request.
+#
+# Owners (type 0) and admins (type 1) are left out: they already reach every
+# collection, and Vaultwarden drops them from a collection's users on save
+# (`if member.access_all { continue; }`), so adding them would be retried,
+# and rewritten, on every pass.
 collection_update() {
 	jq -c --argjson ro "$1" '
 		.collection as $c
 		| ([$c.users[]?.id]) as $have
-		| [.members[] | select(.status == 2 and (.id as $i | $have | index($i) | not))
+		| [.members[] | select(.status == 2 and .type != 0 and .type != 1 and (.id as $i | $have | index($i) | not))
 			| {id, readOnly: $ro, hidePasswords: false, manage: false}] as $add
 		| if ($add | length) == 0 then empty
 		  else {organizationId: $c.organizationId, name: $c.name, externalId: $c.externalId,

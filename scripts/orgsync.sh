@@ -119,6 +119,12 @@ collection_update() {
 		  end'
 }
 
+# collection_id ID_OR_NAME: reads `bw list org-collections` output on stdin and
+# prints the collection's id. An id is the stable choice: it survives renames.
+collection_id() {
+	jq -r --arg n "$1" '[.data.data[]? | select(.id == $n or .name == $n) | .id] | first // empty'
+}
+
 # bwdc_settings: reads bwdc's data.json on stdin and the Google key JSON from
 # the file in $1, prints data.json with the Workspace directory and the sync
 # options set. Only keys this script owns are touched.
@@ -229,8 +235,8 @@ confirm_and_share() {
 
 	if [ -n "${COLLECTION}" ]; then
 		out=$(api GET "/list/object/org-collections?organizationid=${ORG_ID}")
-		cid=$(jq -r --arg n "${COLLECTION}" '[.data.data[]? | select(.name == $n) | .id] | first // empty' <<< "${out}")
-		[ -n "${cid}" ] || { report confirm FAIL "no collection named '${COLLECTION}'"; return 1; }
+		cid=$(collection_id "${COLLECTION}" <<< "${out}")
+		[ -n "${cid}" ] || { report confirm FAIL "no collection with id or name '${COLLECTION}'"; return 1; }
 		col=$(api GET "/object/org-collection/${cid}?organizationid=${ORG_ID}" | jq -c '.data')
 		body=$(jq -n --argjson m "${members}" --argjson c "${col}" '{members: $m, collection: $c}' | collection_update "${COLLECTION_READONLY}")
 		if [ -n "${body}" ]; then

@@ -1,0 +1,10 @@
+[
+  {"object":"org-member","id":"11111111-1111-1111-1111-111111111111","email":"owner@27z.fr","status":2,"type":0},
+  {"object":"org-member","id":"22222222-2222-2222-2222-222222222222","email":"robot@27z.fr","status":2,"type":1},
+  {"object":"org-member","id":"33333333-3333-3333-3333-333333333333","email":"alice@27z.fr","status":1,"type":2},
+  {"object":"org-member","id":"44444444-4444-4444-4444-444444444444","email":"bob@27z.fr","status":0,"type":2},
+  {"object":"org-member","id":"55555555-5555-5555-5555-555555555555","email":"admin2@27z.fr","status":1,"type":1},
+  {"object":"org-member","id":"66666666-6666-6666-6666-666666666666","email":"carol@27z.fr","status":2,"type":2},
+  {"object":"org-member","id":"77777777-7777-7777-7777-777777777777","email":"dave@27z.fr","status":-1,"type":2},
+  {"object":"org-member","id":"88888888-8888-8888-8888-888888888888","email":"erin@27z.fr","status":1,"type":2}
+]

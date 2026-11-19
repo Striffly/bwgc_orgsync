@@ -1,0 +1,36 @@
+name: Rebuild when the base image or its packages change
+
+# The check and the keepalive live in Striffly/bwgc_workflows; see
+# check-for-updates.yml and keepalive.yml there for how each decides. Only
+# master is published here, there are no releases to keep current.
+
+on:
+  schedule:
+    - cron: '45 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    uses: Striffly/bwgc_workflows/.github/workflows/check-for-updates.yml@1f55cf700c66a3fbab0a069f66d3f26cf1c1c391 # v1.1.2-2-g1f55cf7
+
+  build:
+    needs: check
+    if: needs.check.outputs.needs_build == 'true'
+    uses: ./.github/workflows/build-docker-image.yml
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write
+
+  keepalive:
+    # Scheduled workflows stop after 60 days without a commit; a real build
+    # pushes and resets the clock on its own, so this only fires when quiet.
+    needs: check
+    if: needs.check.outputs.needs_build == 'false'
+    uses: Striffly/bwgc_workflows/.github/workflows/keepalive.yml@1f55cf700c66a3fbab0a069f66d3f26cf1c1c391 # v1.1.2-2-g1f55cf7
+    permissions:
+      contents: write

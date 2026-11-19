@@ -1,0 +1,25 @@
+# Keeps the pinned actions, the shared bwgc_workflows reference and the
+# Debian base image current. bw and bwdc are pinned in the Dockerfile with
+# their checksums and bumped by hand: a new release needs its new checksum.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    # Third-party releases wait three days, the delay images get on the hosts.
+    # Our own shared workflows are proposed right away.
+    cooldown:
+      default-days: 3
+      exclude:
+        - "Striffly/bwgc_workflows*"
+
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 3

@@ -1,0 +1,36 @@
+name: Docker build image
+
+# The build itself lives in Striffly/bwgc_workflows, shared with the other
+# bwgc_* image repositories: test, publish to ghcr.io as :master and a dated
+# master-YYYYMMDD-HHMMSS tag, then Trivy and cosign. This file keeps what is
+# particular to this repository: when to build, and the inputs below.
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'Dockerfile'
+      - 'scripts/**'
+  # Pull requests get the build and the test suite, but nothing is pushed,
+  # scanned or signed.
+  pull_request:
+    paths:
+      - 'Dockerfile'
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/build-docker-image.yml'
+  # The nightly rebuild calls this when the base image or a package moved.
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: Striffly/bwgc_workflows/.github/workflows/build-image.yml@1f55cf700c66a3fbab0a069f66d3f26cf1c1c391 # v1.1.2-2-g1f55cf7
+    with:
+      test-image: bwgc_orgsync:test
+      shellcheck: true
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      security-events: write

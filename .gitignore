@@ -1,0 +1,4 @@
+# Secrets and state never belong in the repository.
+orgsync.env
+google-key.json
+/data/

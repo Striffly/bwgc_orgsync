@@ -1,4 +1,5 @@
-# Secrets and state never belong in the repository.
-orgsync.env
-google-key.json
+# Secrets and state never belong in the repository. Anchored to the root:
+# tests/fixtures holds a fake google-key.json the suite needs.
+/orgsync.env
+/google-key.json
 /data/

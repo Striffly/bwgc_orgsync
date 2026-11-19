@@ -1,0 +1,1 @@
+{"type":"service_account","project_id":"test","private_key_id":"0","private_key":"-----BEGIN PRIVATE KEY-----\nFAKE\n-----END PRIVATE KEY-----\n","client_email":"bwdc-sync@test.iam.gserviceaccount.com","client_id":"1"}

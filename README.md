@@ -10,11 +10,14 @@ as the opt-in `orgsync` service.
 | 15 min | New Workspace users are invited to the organisation. With `ORGSYNC_OVERWRITE_EXISTING=true`, members no longer in Workspace are removed; suspended users are removed with `ORGSYNC_REMOVE_DISABLED=true`. | [Bitwarden Directory Connector](https://bitwarden.com/help/directory-sync/) (`bwdc`), users only, no groups |
 | 1 min | Members who accepted their invitation are confirmed, and every confirmed member is given `ORGSYNC_COLLECTION`. | [Bitwarden CLI](https://bitwarden.com/help/cli/) (`bw serve`), logged in as an admin account |
 
-Image: `ghcr.io/striffly/bwgc_orgsync:master`, Debian with pinned `bw` and
-`bwdc` releases whose checksums are verified at build time. Tested, scanned by
+Image: `ghcr.io/striffly/bwgc_orgsync:master`, Debian with the newest `bw` and
+`bwdc` releases at build time (recorded in `/opt/versions`). Tested, scanned by
 Trivy and signed with cosign by the shared
-[bwgc_workflows](https://github.com/Striffly/bwgc_workflows), and rebuilt
-nightly when the base image or a package falls behind.
+[bwgc_workflows](https://github.com/Striffly/bwgc_workflows), rebuilt weekly
+to pick up new `bw` and `bwdc` releases, and nightly when the base image or a
+package falls behind. A release that breaks the tests is never published, and
+bitwarden_gcloud's autoupdate holds every new image three days before
+installing it.
 
 ## Why an admin account on the server
 

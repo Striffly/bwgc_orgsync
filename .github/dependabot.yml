@@ -1,6 +1,6 @@
 # Keeps the pinned actions, the shared bwgc_workflows reference and the
-# Debian base image current. bw and bwdc are pinned in the Dockerfile with
-# their checksums and bumped by hand: a new release needs its new checksum.
+# Debian base image current. bw and bwdc are not pinned: the weekly build in
+# build-docker-image.yml takes their newest releases.
 version: 2
 updates:
   - package-ecosystem: github-actions

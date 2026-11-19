@@ -6,31 +6,31 @@
 # base image or any installed package falls behind.
 FROM debian:trixie-slim
 
-# Bitwarden CLI and Directory Connector, from their GitHub releases. The
-# checksums are the ones GitHub publishes for each asset: a release that is
-# replaced or tampered with after the fact fails the build.
-ARG BW_VERSION=2026.10.1
-ARG BW_SHA256=eb09c3715291c21cf744819b873a255c1247b1b8b45bae138621a644ec7ad8f5
-ARG BWDC_VERSION=2026.10.0
-ARG BWDC_SHA256=b46e723804ab1ab3a8b3cb34cd5901acb44a570d94cdc5176e80ebde086dd994
-
-# apt-get upgrade first: the base image's own packages can lag the archive,
-# and the nightly rebuild only helps if it brings them up to date too.
+# bw and bwdc are not pinned: every build takes the newest release of each,
+# and build-docker-image.yml rebuilds weekly so new releases arrive on their
+# own. The test suite runs against the built image before it is published,
+# and bitwarden_gcloud's autoupdate holds every new image in quarantine for
+# three days before installing it.
+#
+# apt-get upgrade first: the base image's own packages can lag the archive.
 # libatomic1: bwdc does not start without it. curl and jq: the sync script.
 RUN set -eux; \
     apt-get update; \
     apt-get upgrade -y; \
     apt-get install -y --no-install-recommends ca-certificates curl jq libatomic1 tini unzip; \
-    curl -fsSL --retry 5 -o /tmp/bw.zip \
-      "https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip"; \
-    echo "${BW_SHA256}  /tmp/bw.zip" | sha256sum -c -; \
+    # Bitwarden's own download link redirects to the newest CLI release.
+    curl -fsSL --retry 5 -o /tmp/bw.zip "https://vault.bitwarden.com/download/?app=cli&platform=linux"; \
+    # GitHub redirects releases/latest to the newest release's tag.
+    BWDC_TAG=$(curl -fsSI --retry 5 https://github.com/bitwarden/directory-connector/releases/latest \
+      | sed -n 's|^[Ll]ocation: .*/tag/\(v[0-9.]*\).*|\1|p'); \
+    test -n "${BWDC_TAG}"; \
     curl -fsSL --retry 5 -o /tmp/bwdc.zip \
-      "https://github.com/bitwarden/directory-connector/releases/download/v${BWDC_VERSION}/bwdc-linux-${BWDC_VERSION}.zip"; \
-    echo "${BWDC_SHA256}  /tmp/bwdc.zip" | sha256sum -c -; \
+      "https://github.com/bitwarden/directory-connector/releases/download/${BWDC_TAG}/bwdc-linux-${BWDC_TAG#v}.zip"; \
     mkdir -p /opt/bw /opt/bwdc; \
     unzip -q /tmp/bw.zip -d /opt/bw; \
     unzip -q /tmp/bwdc.zip -d /opt/bwdc; \
     chmod 755 /opt/bw/bw /opt/bwdc/bwdc; \
+    echo "bw $(/opt/bw/bw --version), bwdc $(/opt/bwdc/bwdc --version)" | tee /opt/versions; \
     rm -f /tmp/bw.zip /tmp/bwdc.zip; \
     apt-get purge -y unzip; \
     apt-get autoremove -y; \

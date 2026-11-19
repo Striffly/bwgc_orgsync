@@ -19,6 +19,9 @@ on:
       - 'scripts/**'
       - 'tests/**'
       - '.github/workflows/build-docker-image.yml'
+  # bw and bwdc are not pinned: a weekly build picks up their new releases.
+  schedule:
+    - cron: '30 4 * * 1'
   # The nightly rebuild calls this when the base image or a package moved.
   workflow_call:
   workflow_dispatch:

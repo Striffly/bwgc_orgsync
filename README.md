@@ -83,9 +83,12 @@ Files, mounted read-only:
   organisation's is under the organisation's Settings, Organization info,
   API key.
 - `/secrets/google-key.json`, the JSON key of a service account with
-  domain-wide delegation for
-  `https://www.googleapis.com/auth/admin.directory.user.readonly` and
-  `https://www.googleapis.com/auth/admin.directory.group.readonly`.
+  domain-wide delegation for all three of
+  `https://www.googleapis.com/auth/admin.directory.user.readonly`,
+  `https://www.googleapis.com/auth/admin.directory.group.readonly` and
+  `https://www.googleapis.com/auth/admin.directory.group.member.readonly`.
+  bwdc requests the three together, even when it syncs users only, and
+  Google refuses the whole token (`unauthorized_client`) if one is missing.
 
 State (bw and bwdc data, the heartbeat) goes to `/data`.
 

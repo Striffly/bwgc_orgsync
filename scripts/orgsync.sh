@@ -30,7 +30,9 @@ BWDC=${ORGSYNC_BWDC:-/opt/bwdc/bwdc}
 DATA=${ORGSYNC_DATA:-/data}
 SECRETS=${ORGSYNC_SECRETS:-/secrets/orgsync.env}
 GOOGLE_KEY=${ORGSYNC_GOOGLE_KEY:-/secrets/google-key.json}
-SERVER=${ORGSYNC_SERVER:-http://bitwarden:80}
+# HTTPS only: bw refuses a plain http:// server ("Insecure URL not allowed").
+# In bitwarden_gcloud it is https://$DOMAIN, resolved to the proxy container.
+SERVER=${ORGSYNC_SERVER:-}
 PORT=${ORGSYNC_PORT:-8087}
 
 COLLECTION=${ORGSYNC_COLLECTION:-}
@@ -268,6 +270,10 @@ directory_sync() {
 main() {
 	mkdir -p "${BITWARDENCLI_APPDATA_DIR}" "${BITWARDENCLI_CONNECTOR_APPDATA_DIR}"
 	chmod 700 "${DATA}" "${BITWARDENCLI_APPDATA_DIR}" "${BITWARDENCLI_CONNECTOR_APPDATA_DIR}" 2>/dev/null || true
+	case "${SERVER}" in
+		https://*) ;;
+		*) log "ORGSYNC_SERVER must be the vault's https:// address (bw refuses http), got '${SERVER}'"; exit 1 ;;
+	esac
 	read_secrets "${SECRETS}" || exit 1
 	ORG_ID=$(org_id_from_client_id "${ORG_CLIENT_ID}") || { log "ORG_CLIENT_ID is not organization.<id>"; exit 1; }
 	log "organisation ${ORG_ID}, server ${SERVER}, collection '${COLLECTION:-none}', directory ${DIRECTORY}"

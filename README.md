@@ -51,7 +51,7 @@ Environment:
 
 | Variable | Default | |
 |---|---|---|
-| `ORGSYNC_SERVER` | `http://bitwarden:80` | Vaultwarden, reached on the stack's network |
+| `ORGSYNC_SERVER` | *(required)* | The vault's `https://` address. `bw` refuses plain `http://`, so it goes through the TLS proxy; bitwarden_gcloud resolves `$DOMAIN` to the proxy container, so the traffic never leaves the host |
 | `ORGSYNC_COLLECTION` | *(none)* | Collection every confirmed member is given; empty to only confirm |
 | `ORGSYNC_COLLECTION_READONLY` | `true` | `false` lets members edit its items |
 | `ORGSYNC_CONFIRM_INTERVAL` | `60` | Seconds between confirm passes |
